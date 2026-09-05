@@ -390,19 +390,197 @@
     color: var(--text-on-dark-dim);
     margin-bottom: 10px;
   }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+  }
+  .mode-toggle {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 999px;
+    padding: 3px;
+  }
+  .mode-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-on-dark-dim);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .mode-btn.active { background: var(--accent); color: #2b2205; }
+
+  .tabs .tab-btn { font-size: 0.78rem; padding: 9px 4px; }
+
+  .scorecard-section {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .scorecard-section h2 {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    color: var(--text-on-dark);
+  }
+  .add-player-row { display: flex; gap: 8px; }
+  .add-player-row input {
+    flex: 1;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.06);
+    color: var(--text-on-dark);
+  }
+  .add-player-row input::placeholder { color: var(--text-on-dark-dim); }
+
+  .player-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .player-row:last-child { border-bottom: none; }
+  .player-name {
+    flex: 1;
+    color: var(--text-on-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .score-control { display: flex; align-items: center; gap: 6px; }
+  .score-btn {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    color: var(--text-on-dark);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+  .score-input {
+    width: 46px;
+    text-align: center;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 5px 2px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    background: rgba(255,255,255,0.06);
+    color: var(--text-on-dark);
+  }
+  .remove-player-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-on-dark-dim);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+  .empty-hint {
+    color: var(--text-on-dark-dim);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 6px 0;
+  }
+
+  .hole-log-list { display: flex; flex-direction: column; gap: 6px; max-height: 340px; overflow-y: auto; }
+  .hole-log-row {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-size: 0.85rem;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .hole-log-row:last-child { border-bottom: none; }
+  .hole-log-num {
+    flex: 0 0 auto;
+    width: 44px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .hole-log-text { color: var(--text-on-dark); }
+  .hole-log-text.empty { color: var(--text-on-dark-dim); font-style: italic; }
+  .hole-log-cat {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--text-on-dark-dim);
+  }
+
+  .round-log-box {
+    color: var(--text-on-dark);
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  .round-log-box.empty { color: var(--text-on-dark-dim); font-style: italic; }
+
+  .share-tab { text-align: center; padding: 8px 4px; }
+  .share-tab p {
+    color: var(--text-on-dark-dim);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin: 6px 0 20px;
+  }
+  .qr-wrap {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+  .qr-img { display: block; width: 220px; height: 220px; }
+  .share-url-box {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text-on-dark-dim);
+    font-size: 0.78rem;
+    word-break: break-all;
+    margin-bottom: 14px;
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header class="app-header">
-    <h1>⛳ Fairway Flip</h1>
+    <div class="header-top">
+      <h1>⛳ Fairway Flip</h1>
+      <div class="mode-toggle" id="modeToggle">
+        <button class="mode-btn" data-mode="9">9</button>
+        <button class="mode-btn" data-mode="18">18</button>
+      </div>
+    </div>
     <p>Tap to reveal your challenge. Add your own. Share the link with your group.</p>
   </header>
 
   <div class="tabs">
-    <button class="tab-btn active" data-tab="hole">Hole Challenges</button>
-    <button class="tab-btn" data-tab="round">Round Challenge</button>
+    <button class="tab-btn active" data-tab="hole">Hole</button>
+    <button class="tab-btn" data-tab="round">Round</button>
+    <button class="tab-btn" data-tab="scorecard">Scorecard</button>
+    <button class="tab-btn" data-tab="share">Share</button>
   </div>
 
   <div class="filters" id="filters"></div>
@@ -430,7 +608,7 @@
 
     <button class="btn btn-primary" id="revealHoleBtn">Reveal Challenge for Hole <span id="revealHoleNum">1</span></button>
     <div class="actions-row">
-      <button class="btn btn-secondary" id="redrawHoleBtn" disabled>🔄 Draw a different one</button>
+      <button class="btn btn-secondary" id="redrawHoleBtn" disabled>⏭️ Skip — draw another</button>
     </div>
     <div class="empty-note" id="holeEmptyNote"></div>
   </div>
@@ -455,9 +633,40 @@
 
     <button class="btn btn-primary" id="revealRoundBtn">Reveal Round Challenge</button>
     <div class="actions-row">
-      <button class="btn btn-secondary" id="redrawRoundBtn" disabled>🔄 Draw a different one</button>
+      <button class="btn btn-secondary" id="redrawRoundBtn" disabled>⏭️ Skip — draw another</button>
     </div>
     <div class="empty-note" id="roundEmptyNote"></div>
+  </div>
+
+  <!-- SCORECARD PANEL -->
+  <div class="panel" id="panel-scorecard">
+    <div class="scorecard-section">
+      <h2>Standings</h2>
+      <div id="standingsList"></div>
+      <div class="add-player-row" style="margin-top:10px;">
+        <input type="text" id="newPlayerName" placeholder="Add player name">
+        <button class="btn btn-primary" id="addPlayerBtn" style="width:auto; margin-bottom:0;">Add</button>
+      </div>
+    </div>
+    <div class="scorecard-section">
+      <h2>Round Challenge</h2>
+      <div id="roundLogBox" class="round-log-box empty">No round challenge drawn yet.</div>
+    </div>
+    <div class="scorecard-section">
+      <h2>Hole-by-Hole</h2>
+      <div id="holeLogList" class="hole-log-list"></div>
+    </div>
+  </div>
+
+  <!-- SHARE PANEL -->
+  <div class="panel" id="panel-share">
+    <div class="share-tab">
+      <h2 style="font-size:1.1rem; margin-bottom:2px;">Share This Deck</h2>
+      <p>Scan to join on your phone — anyone with this link can reveal cards, keep score, and add their own challenges.</p>
+      <div class="qr-wrap"><img class="qr-img" id="qrImg" alt="QR code to this page"></div>
+      <div class="share-url-box" id="shareUrlBox"></div>
+      <button class="btn btn-primary" id="shareCopyBtn" style="max-width:280px; margin:0 auto;">🔗 Copy Link</button>
+    </div>
   </div>
 
   <div class="toolbar">
@@ -677,6 +886,7 @@
   var CATS = ["skill", "improvement", "wager", "fun"];
   var CAT_LABEL = { skill: "⛳ Skill", improvement: "📈 Improvement", wager: "💰 Wager", fun: "🎉 Fun" };
   var STORAGE_KEY = "fairwayFlipCustomChallenges";
+  var SCORECARD_KEY = "fairwayFlipScorecard";
 
   // ---------- State ----------
   var state = {
@@ -687,7 +897,11 @@
     usedHoleIds: new Set(),
     usedRoundIds: new Set(),
     currentHoleChallenge: null,
-    currentRoundChallenge: null
+    currentRoundChallenge: null,
+    holeMode: 18,
+    players: [],
+    holeLog: {},
+    roundLog: null
   };
 
   function allChallenges() {
@@ -714,6 +928,34 @@
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.customChallenges));
     } catch (e) {
       // storage unavailable (private browsing etc.) — additions just won't persist across reloads
+    }
+  }
+
+  // ---------- Local storage (scorecard: mode, players, hole/round log) ----------
+  function loadScorecard() {
+    try {
+      var raw = window.localStorage.getItem(SCORECARD_KEY);
+      var data = raw ? JSON.parse(raw) : null;
+      if (data) {
+        state.holeMode = data.holeMode === 9 ? 9 : 18;
+        state.players = Array.isArray(data.players) ? data.players : [];
+        state.holeLog = data.holeLog && typeof data.holeLog === "object" ? data.holeLog : {};
+        state.roundLog = data.roundLog || null;
+      }
+    } catch (e) {
+      // keep defaults
+    }
+  }
+  function saveScorecard() {
+    try {
+      window.localStorage.setItem(SCORECARD_KEY, JSON.stringify({
+        holeMode: state.holeMode,
+        players: state.players,
+        holeLog: state.holeLog,
+        roundLog: state.roundLog
+      }));
+    } catch (e) {
+      // storage unavailable — scorecard just won't persist across reloads
     }
   }
 
@@ -765,7 +1007,7 @@
   var holeStripEl = document.getElementById("holeStrip");
   function renderHoleStrip() {
     holeStripEl.innerHTML = "";
-    for (var i = 1; i <= 18; i++) {
+    for (var i = 1; i <= state.holeMode; i++) {
       (function (num) {
         var pill = document.createElement("button");
         pill.className = "hole-pill" + (num === state.selectedHole ? " active" : "");
@@ -782,6 +1024,8 @@
   }
 
   // ---------- Tabs ----------
+  var filtersRowEl = document.getElementById("filters");
+  var poolCountEl = document.getElementById("poolCount");
   document.querySelectorAll(".tab-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {
       document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.remove("active"); });
@@ -789,9 +1033,192 @@
       state.activeTab = btn.dataset.tab;
       document.getElementById("panel-hole").classList.toggle("active", state.activeTab === "hole");
       document.getElementById("panel-round").classList.toggle("active", state.activeTab === "round");
-      updatePoolCount();
+      document.getElementById("panel-scorecard").classList.toggle("active", state.activeTab === "scorecard");
+      document.getElementById("panel-share").classList.toggle("active", state.activeTab === "share");
+      var showFilters = state.activeTab === "hole" || state.activeTab === "round";
+      filtersRowEl.style.display = showFilters ? "" : "none";
+      poolCountEl.style.display = showFilters ? "" : "none";
+      if (showFilters) updatePoolCount();
+      if (state.activeTab === "scorecard") {
+        renderStandings();
+        renderHoleLog();
+        renderRoundLog();
+      }
+      if (state.activeTab === "share") {
+        initShareTab();
+      }
     });
   });
+
+  // ---------- Mode toggle (9 / 18 holes) ----------
+  function renderModeToggle() {
+    document.querySelectorAll(".mode-btn").forEach(function (b) {
+      b.classList.toggle("active", Number(b.dataset.mode) === state.holeMode);
+    });
+  }
+  document.querySelectorAll(".mode-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var mode = Number(btn.dataset.mode);
+      if (mode === state.holeMode) return;
+      state.holeMode = mode;
+      if (state.selectedHole > state.holeMode) state.selectedHole = 1;
+      saveScorecard();
+      renderModeToggle();
+      renderHoleStrip();
+      resetHoleCardToFront();
+      if (state.activeTab === "scorecard") renderHoleLog();
+      showToast(mode + "-hole mode set.");
+    });
+  });
+
+  // ---------- Scorecard: standings ----------
+  var standingsListEl = document.getElementById("standingsList");
+  function renderStandings() {
+    standingsListEl.innerHTML = "";
+    if (state.players.length === 0) {
+      var hint = document.createElement("div");
+      hint.className = "empty-hint";
+      hint.textContent = "Add players below to start tracking points.";
+      standingsListEl.appendChild(hint);
+      return;
+    }
+    var maxScore = Math.max.apply(null, state.players.map(function (p) { return p.score; }));
+    var sorted = state.players.slice().sort(function (a, b) { return b.score - a.score; });
+    sorted.forEach(function (p) {
+      var row = document.createElement("div");
+      row.className = "player-row";
+
+      var nameEl = document.createElement("div");
+      nameEl.className = "player-name";
+      nameEl.textContent = (p.score === maxScore && maxScore > 0 ? "🏆 " : "") + p.name;
+      row.appendChild(nameEl);
+
+      var control = document.createElement("div");
+      control.className = "score-control";
+
+      var minusBtn = document.createElement("button");
+      minusBtn.className = "score-btn";
+      minusBtn.textContent = "−";
+      minusBtn.addEventListener("click", function () { adjustScore(p.id, -1); });
+      control.appendChild(minusBtn);
+
+      var input = document.createElement("input");
+      input.type = "number";
+      input.className = "score-input";
+      input.value = p.score;
+      input.addEventListener("change", function () {
+        var v = parseInt(input.value, 10);
+        setScore(p.id, isNaN(v) ? 0 : v);
+      });
+      control.appendChild(input);
+
+      var plusBtn = document.createElement("button");
+      plusBtn.className = "score-btn";
+      plusBtn.textContent = "+";
+      plusBtn.addEventListener("click", function () { adjustScore(p.id, 1); });
+      control.appendChild(plusBtn);
+
+      var removeBtn = document.createElement("button");
+      removeBtn.className = "remove-player-btn";
+      removeBtn.textContent = "✕";
+      removeBtn.addEventListener("click", function () { removePlayer(p.id); });
+      control.appendChild(removeBtn);
+
+      row.appendChild(control);
+      standingsListEl.appendChild(row);
+    });
+  }
+
+  function addPlayer(name) {
+    state.players.push({ id: "p-" + Date.now() + "-" + Math.floor(Math.random() * 1000), name: name, score: 0 });
+    saveScorecard();
+    renderStandings();
+  }
+  function removePlayer(id) {
+    state.players = state.players.filter(function (p) { return p.id !== id; });
+    saveScorecard();
+    renderStandings();
+  }
+  function adjustScore(id, delta) {
+    var p = state.players.find(function (p) { return p.id === id; });
+    if (!p) return;
+    p.score += delta;
+    saveScorecard();
+    renderStandings();
+  }
+  function setScore(id, value) {
+    var p = state.players.find(function (p) { return p.id === id; });
+    if (!p) return;
+    p.score = value;
+    saveScorecard();
+    renderStandings();
+  }
+
+  document.getElementById("addPlayerBtn").addEventListener("click", function () {
+    var input = document.getElementById("newPlayerName");
+    var name = input.value.trim();
+    if (!name) { showToast("Enter a name first."); return; }
+    addPlayer(name);
+    input.value = "";
+  });
+  document.getElementById("newPlayerName").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") document.getElementById("addPlayerBtn").click();
+  });
+
+  // ---------- Scorecard: hole-by-hole and round log ----------
+  var holeLogListEl = document.getElementById("holeLogList");
+  function renderHoleLog() {
+    holeLogListEl.innerHTML = "";
+    for (var i = 1; i <= state.holeMode; i++) {
+      var entry = state.holeLog[i];
+      var row = document.createElement("div");
+      row.className = "hole-log-row";
+      var num = document.createElement("div");
+      num.className = "hole-log-num";
+      num.textContent = "Hole " + i;
+      row.appendChild(num);
+      var text = document.createElement("div");
+      if (entry) {
+        text.className = "hole-log-text";
+        text.innerHTML = "<span class=\"hole-log-cat\">" + CAT_LABEL[entry.category] + "</span><br>" + entry.text;
+      } else {
+        text.className = "hole-log-text empty";
+        text.textContent = "Not drawn yet";
+      }
+      row.appendChild(text);
+      holeLogListEl.appendChild(row);
+    }
+  }
+
+  var roundLogBoxEl = document.getElementById("roundLogBox");
+  function renderRoundLog() {
+    if (state.roundLog) {
+      roundLogBoxEl.classList.remove("empty");
+      roundLogBoxEl.innerHTML = "<span class=\"hole-log-cat\">" + CAT_LABEL[state.roundLog.category] + "</span><br>" + state.roundLog.text;
+    } else {
+      roundLogBoxEl.classList.add("empty");
+      roundLogBoxEl.textContent = "No round challenge drawn yet.";
+    }
+  }
+
+  // ---------- Share tab ----------
+  var shareTabInited = false;
+  function initShareTab() {
+    var url = window.location.href;
+    document.getElementById("qrImg").src = "https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=" + encodeURIComponent(url);
+    document.getElementById("shareUrlBox").textContent = url;
+    if (!shareTabInited) {
+      document.getElementById("shareCopyBtn").addEventListener("click", function () {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(url).then(function () { showToast("Link copied — send it to your group!"); })
+            .catch(function () { showToast(url); });
+        } else {
+          showToast(url);
+        }
+      });
+      shareTabInited = true;
+    }
+  }
 
   // ---------- Card flip / draw logic ----------
   function pickRandom(pool) {
@@ -851,9 +1278,15 @@
       if (scope === "hole") {
         state.currentHoleChallenge = result.challenge;
         document.getElementById("redrawHoleBtn").disabled = false;
+        state.holeLog[state.selectedHole] = { text: result.challenge.text, category: result.challenge.category };
+        saveScorecard();
+        renderHoleLog();
       } else {
         state.currentRoundChallenge = result.challenge;
         document.getElementById("redrawRoundBtn").disabled = false;
+        state.roundLog = { text: result.challenge.text, category: result.challenge.category };
+        saveScorecard();
+        renderRoundLog();
       }
       if (result.reshuffled) showToast("Deck reshuffled — back through the pile!");
     }, 480);
@@ -875,10 +1308,17 @@
     state.usedHoleIds.clear();
     state.usedRoundIds.clear();
     state.selectedHole = 1;
+    state.holeLog = {};
+    state.roundLog = null;
+    state.players.forEach(function (p) { p.score = 0; });
+    saveScorecard();
     resetHoleCardToFront();
     resetRoundCardToFront();
     renderHoleStrip();
-    showToast("New round — decks reset.");
+    renderStandings();
+    renderHoleLog();
+    renderRoundLog();
+    showToast("New round — decks and scores reset.");
   });
 
   // ---------- Share ----------
@@ -943,9 +1383,14 @@
 
   // ---------- Init ----------
   loadCustomChallenges();
+  loadScorecard();
   renderFilters();
+  renderModeToggle();
   renderHoleStrip();
   updatePoolCount();
+  renderStandings();
+  renderHoleLog();
+  renderRoundLog();
 })();
 </script>
 </body>
