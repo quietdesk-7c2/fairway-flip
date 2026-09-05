@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Fairway Flip</title>
+<style>
+  :root {
+    --bg: #0f3d2e;
+    --bg-2: #144a37;
+    --surface: #ffffff;
+    --surface-2: #f4f7f4;
+    --text: #12271d;
+    --text-dim: #5b6f63;
+    --text-on-dark: #eef7f0;
+    --text-on-dark-dim: #b7cdc0;
+    --accent: #d4a72c;
+    --accent-2: #e8c869;
+    --border: #dbe4de;
+    --border-dark: #2a5c46;
+    --card-back: #35664e;
+    --skill: #2f6fb0;
+    --improvement: #2f9e6f;
+    --wager: #c1552c;
+    --fun: #a447a8;
+    --danger: #c0392b;
+    --shadow: rgba(15, 61, 46, 0.25);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a2a1f;
+      --bg-2: #0d3527;
+      --surface: #17281f;
+      --surface-2: #1e3428;
+      --text: #eef7f0;
+      --text-dim: #a9c0b3;
+      --border: #2c4b3b;
+      --border-dark: #2a5c46;
+      --card-back: #2a5240;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a2a1f;
+    --bg-2: #0d3527;
+    --surface: #17281f;
+    --surface-2: #1e3428;
+    --text: #eef7f0;
+    --text-dim: #a9c0b3;
+    --border: #2c4b3b;
+    --border-dark: #2a5c46;
+    --card-back: #2a5240;
+    --shadow: rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text-on-dark);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    min-height: 100vh;
+  }
+  body {
+    background: radial-gradient(circle at 20% 0%, var(--bg-2), var(--bg) 60%);
+  }
+  .wrap {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 20px 16px 48px;
+  }
+
+  header.app-header {
+    text-align: center;
+    padding: 8px 0 18px;
+  }
+  header.app-header h1 {
+    margin: 0;
+    font-size: 1.7rem;
+    letter-spacing: -0.02em;
+    color: var(--text-on-dark);
+  }
+  header.app-header p {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: var(--text-on-dark-dim);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    background: rgba(255,255,255,0.08);
+    padding: 4px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-on-dark-dim);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .tab-btn.active {
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .filter-chip {
+    border: 1.5px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.06);
+    color: var(--text-on-dark-dim);
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .filter-chip .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: currentColor;
+    opacity: 0.9;
+  }
+  .filter-chip[data-cat="skill"].active { background: var(--skill); border-color: var(--skill); color: #fff; }
+  .filter-chip[data-cat="improvement"].active { background: var(--improvement); border-color: var(--improvement); color: #fff; }
+  .filter-chip[data-cat="wager"].active { background: var(--wager); border-color: var(--wager); color: #fff; }
+  .filter-chip[data-cat="fun"].active { background: var(--fun); border-color: var(--fun); color: #fff; }
+
+  .hole-strip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 2px 12px;
+    margin-bottom: 4px;
+    scrollbar-width: thin;
+  }
+  .hole-strip::-webkit-scrollbar { height: 5px; }
+  .hole-strip::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+  .hole-pill {
+    flex: 0 0 auto;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.06);
+    color: var(--text-on-dark);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hole-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #2b2205;
+  }
+
+  .card-stage {
+    perspective: 1200px;
+    margin: 8px 0 18px;
+  }
+  .flip-card {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(.4,.2,.2,1);
+    cursor: pointer;
+  }
+  .flip-card.flipped { transform: rotateY(180deg); }
+  .face {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 10px 30px var(--shadow);
+  }
+  .face-front {
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.06) 0 8px, rgba(255,255,255,0.0) 8px 16px),
+      linear-gradient(160deg, var(--card-back), #1f4534 70%);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .face-front .icon { font-size: 2.6rem; margin-bottom: 10px; opacity: 0.9; }
+  .face-front .hint { color: var(--text-on-dark-dim); font-size: 0.95rem; font-weight: 600; }
+  .face-front .sub { color: var(--text-on-dark-dim); font-size: 0.78rem; margin-top: 4px; opacity: 0.8; }
+
+  .face-back {
+    background: var(--surface);
+    color: var(--text);
+    transform: rotateY(180deg);
+    border: 1px solid var(--border);
+  }
+  .cat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #fff;
+    margin-bottom: 14px;
+  }
+  .cat-badge.skill { background: var(--skill); }
+  .cat-badge.improvement { background: var(--improvement); }
+  .cat-badge.wager { background: var(--wager); }
+  .cat-badge.fun { background: var(--fun); }
+  .face-back .challenge-text {
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .face-back .scope-label {
+    margin-top: 12px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .scratch-fx {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(100deg, rgba(255,255,255,0.9) 0 2px, transparent 2px 14px);
+    opacity: 0;
+    mix-blend-mode: overlay;
+  }
+  .flip-card.scratching .scratch-fx {
+    animation: scratchsweep 0.55s ease-out;
+  }
+  @keyframes scratchsweep {
+    0% { opacity: 0; transform: translateX(-30%); }
+    40% { opacity: 0.9; }
+    100% { opacity: 0; transform: translateX(30%); }
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .btn-primary { background: var(--accent); color: #2b2205; }
+  .btn-secondary { background: rgba(255,255,255,0.1); color: var(--text-on-dark); border: 1px solid rgba(255,255,255,0.2); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .actions-row { display: flex; gap: 8px; margin-top: 4px; }
+  .actions-row .btn { margin-bottom: 0; }
+
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+  }
+  .toolbar .btn { flex: 1 1 auto; width: auto; min-width: 130px; }
+
+  .empty-note {
+    color: var(--text-on-dark-dim);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 10px 4px 0;
+  }
+
+  footer.credit {
+    text-align: center;
+    color: var(--text-on-dark-dim);
+    font-size: 0.72rem;
+    opacity: 0.6;
+    margin-top: 28px;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    color: var(--text);
+    width: 100%;
+    max-width: 560px;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .modal h2 { margin: 0 0 4px; font-size: 1.2rem; }
+  .modal .modal-sub { color: var(--text-dim); font-size: 0.82rem; margin-bottom: 16px; }
+  .field-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-dim);
+    margin: 14px 0 6px;
+  }
+  textarea, input[type=text] {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .pick-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pick-btn {
+    border: 1.5px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .pick-btn.selected.cat-skill { background: var(--skill); border-color: var(--skill); color: #fff; }
+  .pick-btn.selected.cat-improvement { background: var(--improvement); border-color: var(--improvement); color: #fff; }
+  .pick-btn.selected.cat-wager { background: var(--wager); border-color: var(--wager); color: #fff; }
+  .pick-btn.selected.cat-fun { background: var(--fun); border-color: var(--fun); color: #fff; }
+  .pick-btn.selected.scope-sel { background: var(--accent); border-color: var(--accent); color: #2b2205; }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-actions .btn { margin-bottom: 0; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #12271d;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    z-index: 60;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .pool-count {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-on-dark-dim);
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="app-header">
+    <h1>⛳ Fairway Flip</h1>
+    <p>Tap to reveal your challenge. Add your own. Share the link with your group.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="hole">Hole Challenges</button>
+    <button class="tab-btn" data-tab="round">Round Challenge</button>
+  </div>
+
+  <div class="filters" id="filters"></div>
+  <div class="pool-count" id="poolCount"></div>
+
+  <!-- HOLE PANEL -->
+  <div class="panel active" id="panel-hole">
+    <div class="hole-strip" id="holeStrip"></div>
+
+    <div class="card-stage">
+      <div class="flip-card" id="holeCard">
+        <div class="face face-front">
+          <div class="scratch-fx"></div>
+          <div class="icon">🎟️</div>
+          <div class="hint" id="holeFrontHint">Hit "Reveal" for Hole 1</div>
+          <div class="sub">Scratch card ready</div>
+        </div>
+        <div class="face face-back">
+          <div class="cat-badge" id="holeCatBadge">Skill</div>
+          <div class="challenge-text" id="holeChallengeText">—</div>
+          <div class="scope-label" id="holeScopeLabel">Hole challenge</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="revealHoleBtn">Reveal Challenge for Hole <span id="revealHoleNum">1</span></button>
+    <div class="actions-row">
+      <button class="btn btn-secondary" id="redrawHoleBtn" disabled>🔄 Draw a different one</button>
+    </div>
+    <div class="empty-note" id="holeEmptyNote"></div>
+  </div>
+
+  <!-- ROUND PANEL -->
+  <div class="panel" id="panel-round">
+    <div class="card-stage">
+      <div class="flip-card" id="roundCard">
+        <div class="face face-front">
+          <div class="scratch-fx"></div>
+          <div class="icon">🎟️</div>
+          <div class="hint">Hit "Reveal" for your round-long challenge</div>
+          <div class="sub">Scratch card ready</div>
+        </div>
+        <div class="face face-back">
+          <div class="cat-badge" id="roundCatBadge">Skill</div>
+          <div class="challenge-text" id="roundChallengeText">—</div>
+          <div class="scope-label">Applies to the whole round</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="revealRoundBtn">Reveal Round Challenge</button>
+    <div class="actions-row">
+      <button class="btn btn-secondary" id="redrawRoundBtn" disabled>🔄 Draw a different one</button>
+    </div>
+    <div class="empty-note" id="roundEmptyNote"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn-secondary" id="newRoundBtn">🏁 New Round (reset)</button>
+    <button class="btn btn-secondary" id="addChallengeBtn">➕ Add a Challenge</button>
+    <button class="btn btn-secondary" id="shareBtn">🔗 Share</button>
+  </div>
+
+  <footer class="credit">150 built-in challenges · your additions save to this device</footer>
+</div>
+
+<!-- Add challenge modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>Add a Challenge</h2>
+    <div class="modal-sub">Add your own to the deck.</div>
+
+    <div class="field-label">Challenge</div>
+    <textarea id="newChallengeText" rows="3" placeholder="e.g. Pick a competitor's shot and make them rehit it"></textarea>
+
+    <div class="field-label">Category</div>
+    <div class="pick-row" id="newCatRow">
+      <button class="pick-btn cat-skill" data-cat="skill">⛳ Skill</button>
+      <button class="pick-btn cat-improvement" data-cat="improvement">📈 Improvement</button>
+      <button class="pick-btn cat-wager" data-cat="wager">💰 Wager</button>
+      <button class="pick-btn cat-fun" data-cat="fun">🎉 Fun</button>
+    </div>
+
+    <div class="field-label">Applies to</div>
+    <div class="pick-row" id="newScopeRow">
+      <button class="pick-btn scope-sel" data-scope="hole">One hole</button>
+      <button class="pick-btn scope-sel" data-scope="round">Whole round</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="cancelAddBtn" style="margin-bottom:0;">Cancel</button>
+      <button class="btn btn-primary" id="saveAddBtn" style="margin-bottom:0;">Add to Deck</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Built-in challenge library (150 total) ----------
+  var BUILT_IN = [
+    // ===== SKILL — hole (24) =====
+    { id:"b1", scope:"hole", category:"skill", text:"Must hit driver off this tee, no matter the yardage." },
+    { id:"b2", scope:"hole", category:"skill", text:"Any shot inside 100 yards must finish on the green or take a 1-shot penalty." },
+    { id:"b3", scope:"hole", category:"skill", text:"Get up-and-down from outside 30 yards for a bonus point." },
+    { id:"b4", scope:"hole", category:"skill", text:"First putt must finish within 3 feet or take a 1-shot penalty." },
+    { id:"b5", scope:"hole", category:"skill", text:"Play this hole using only 3 clubs of your choice." },
+    { id:"b6", scope:"hole", category:"skill", text:"Call your shot shape (draw or fade) before you swing — miss it, take a 1-shot penalty." },
+    { id:"b7", scope:"hole", category:"skill", text:"Tee shot must finish in the fairway or take a 1-shot penalty." },
+    { id:"b8", scope:"hole", category:"skill", text:"Sink a putt over 15 feet for 2 bonus points." },
+    { id:"b9", scope:"hole", category:"skill", text:"No mulligans allowed on this hole — whatever happens counts." },
+    { id:"b10", scope:"hole", category:"skill", text:"Hole out from a greenside bunker for a bonus point." },
+    { id:"b11", scope:"hole", category:"skill", text:"Approach shot must land within 20 feet of the pin or take a 1-shot penalty." },
+    { id:"b12", scope:"hole", category:"skill", text:"Two-putt or better from anywhere on the green for a bonus point." },
+    { id:"b13", scope:"hole", category:"skill", text:"Tee shot with a 3-wood or less — no driver allowed." },
+    { id:"b14", scope:"hole", category:"skill", text:"Chip shot must stop within one flagstick length or take a 1-shot penalty." },
+    { id:"b15", scope:"hole", category:"skill", text:"Plan the whole hole in your head before you pull a club, then commit to it." },
+    { id:"b16", scope:"hole", category:"skill", text:"Every shot must finish on short grass (fairway or green) or take a 1-shot penalty." },
+    { id:"b17", scope:"hole", category:"skill", text:"Par or better earns 2 bonus points; bogey or worse costs 1." },
+    { id:"b18", scope:"hole", category:"skill", text:"Must use the same club for your tee shot and approach — no swapping." },
+    { id:"b19", scope:"hole", category:"skill", text:"Reach the green in regulation for a bonus point." },
+    { id:"b20", scope:"hole", category:"skill", text:"Bunker shot must finish inside 6 feet or take a 1-shot penalty." },
+    { id:"b21", scope:"hole", category:"skill", text:"Lag putt from outside 40 feet must finish within 3 feet for a bonus point." },
+    { id:"b22", scope:"hole", category:"skill", text:"Tee shot must carry any hazard in play — no laying up." },
+    { id:"b23", scope:"hole", category:"skill", text:"Play a low punch shot on your approach, no matter the lie." },
+    { id:"b24", scope:"hole", category:"skill", text:"Finish the hole with the same ball you started it with — a lost ball costs 2 points." },
+
+    // ===== SKILL — round (6) =====
+    { id:"b25", scope:"round", category:"skill", text:"Play the entire round without a 3-putt, or lose a point per 3-putt." },
+    { id:"b26", scope:"round", category:"skill", text:"Every par-3 tee shot must be a mid-iron or shorter." },
+    { id:"b27", scope:"round", category:"skill", text:"No mulligans for the entire round." },
+    { id:"b28", scope:"round", category:"skill", text:"Every bunker shot this round must finish on the green or add to a running penalty tally." },
+    { id:"b29", scope:"round", category:"skill", text:"Track your greens in regulation and try to beat your own average by round's end." },
+    { id:"b30", scope:"round", category:"skill", text:"Every tee shot on par 4s and 5s must be driver — no laying up off the tee." },
+
+    // ===== IMPROVEMENT — hole (24) =====
+    { id:"b31", scope:"hole", category:"improvement", text:"Take one extra practice swing before your tee shot, focused only on tempo." },
+    { id:"b32", scope:"hole", category:"improvement", text:"Pick a target smaller than the fairway and commit to it before swinging." },
+    { id:"b33", scope:"hole", category:"improvement", text:"Play this hole thinking only about tempo, not the outcome." },
+    { id:"b34", scope:"hole", category:"improvement", text:"Visualize the exact shot shape you want before every swing on this hole." },
+    { id:"b35", scope:"hole", category:"improvement", text:"Take one extra club on your approach and swing at 80% effort." },
+    { id:"b36", scope:"hole", category:"improvement", text:"Read every green from two different angles before you putt." },
+    { id:"b37", scope:"hole", category:"improvement", text:"Say your swing thought out loud before every shot on this hole." },
+    { id:"b38", scope:"hole", category:"improvement", text:"Run your full pre-shot routine on every shot — no skipping steps." },
+    { id:"b39", scope:"hole", category:"improvement", text:"Pick your target, then your club, then commit — no changing your mind mid-routine." },
+    { id:"b40", scope:"hole", category:"improvement", text:"Focus only on staying balanced through impact on every swing this hole." },
+    { id:"b41", scope:"hole", category:"improvement", text:"Before your approach, decide your miss and play away from trouble." },
+    { id:"b42", scope:"hole", category:"improvement", text:"Take a practice putt on the fringe before your first putt this hole." },
+    { id:"b43", scope:"hole", category:"improvement", text:"Exhale on your backswing for every shot on this hole." },
+    { id:"b44", scope:"hole", category:"improvement", text:"Play this hole one shot at a time — no thinking past the shot in front of you." },
+    { id:"b45", scope:"hole", category:"improvement", text:"Grip pressure check — soften your hands before every swing this hole." },
+    { id:"b46", scope:"hole", category:"improvement", text:"Commit fully to your club choice; no second-guessing once you've pulled it." },
+    { id:"b47", scope:"hole", category:"improvement", text:"Play a \"boring\" hole — safest shot every time, no hero shots." },
+    { id:"b48", scope:"hole", category:"improvement", text:"Aim for the fat part of the green on your approach, not the pin." },
+    { id:"b49", scope:"hole", category:"improvement", text:"Check your alignment with a club on the ground before every shot." },
+    { id:"b50", scope:"hole", category:"improvement", text:"Slow your transition down on every swing this hole." },
+    { id:"b51", scope:"hole", category:"improvement", text:"Take three deep breaths before your tee shot to reset your focus." },
+    { id:"b52", scope:"hole", category:"improvement", text:"Finish every swing in balance and hold it for two seconds." },
+    { id:"b53", scope:"hole", category:"improvement", text:"Trust your first read on every putt this hole — no re-reading." },
+    { id:"b54", scope:"hole", category:"improvement", text:"Treat every shot on this hole like a practice-range rep — process over result." },
+
+    // ===== IMPROVEMENT — round (6) =====
+    { id:"b55", scope:"round", category:"improvement", text:"Run a full pre-shot routine on every single shot, all round — no rushing." },
+    { id:"b56", scope:"round", category:"improvement", text:"Focus this entire round on tempo over power." },
+    { id:"b57", scope:"round", category:"improvement", text:"Rate your pre-shot routine consistency after every hole and total it up at the end." },
+    { id:"b58", scope:"round", category:"improvement", text:"Play the whole round aiming for the center of every green — no pin-hunting." },
+    { id:"b59", scope:"round", category:"improvement", text:"Keep a mental tally of \"good misses\" separate from your real score." },
+    { id:"b60", scope:"round", category:"improvement", text:"Commit to one swing thought for the entire round and don't change it." },
+
+    // ===== WAGER — hole (35) =====
+    { id:"b61", scope:"hole", category:"wager", text:"Closest to the pin wins a point from everyone else." },
+    { id:"b62", scope:"hole", category:"wager", text:"Longest drive in the fairway wins a point." },
+    { id:"b63", scope:"hole", category:"wager", text:"First ball in the hole wins bragging rights and a point." },
+    { id:"b64", scope:"hole", category:"wager", text:"Loser of the hole buys at the turn." },
+    { id:"b65", scope:"hole", category:"wager", text:"Whoever 3-putts owes everyone a dollar." },
+    { id:"b66", scope:"hole", category:"wager", text:"Skins on this hole — win it outright or it carries to the next." },
+    { id:"b67", scope:"hole", category:"wager", text:"Longest putt made wins a point." },
+    { id:"b68", scope:"hole", category:"wager", text:"Closest to the pin from the fairway (not the rough) wins a point." },
+    { id:"b69", scope:"hole", category:"wager", text:"Best-looking bunker escape, by group vote, wins a point." },
+    { id:"b70", scope:"hole", category:"wager", text:"Whoever's ball finishes farthest from the pin buys the next round of snacks." },
+    { id:"b71", scope:"hole", category:"wager", text:"Straightest drive, by group vote, wins a point." },
+    { id:"b72", scope:"hole", category:"wager", text:"Anyone who beats their handicap by 2+ strokes on this hole owes a dollar." },
+    { id:"b73", scope:"hole", category:"wager", text:"Worst drive of the group has to hit their second shot standing on one foot." },
+    { id:"b74", scope:"hole", category:"wager", text:"First on the green wins a point — but must still two-putt or it's void." },
+    { id:"b75", scope:"hole", category:"wager", text:"Birdie or better doubles the hole's points." },
+    { id:"b76", scope:"hole", category:"wager", text:"Whoever's away has to call their shot type before they hit." },
+    { id:"b77", scope:"hole", category:"wager", text:"Split the hole — low score wins half the pot, closest to pin wins the other half." },
+    { id:"b78", scope:"hole", category:"wager", text:"Loser owes the group a story from their worst round ever." },
+    { id:"b79", scope:"hole", category:"wager", text:"Press — down players can double the bet for the rest of the hole." },
+    { id:"b80", scope:"hole", category:"wager", text:"Whoever hits it closest to the cart path owes a dollar." },
+    { id:"b81", scope:"hole", category:"wager", text:"First one to find a bunker owes everyone a dollar." },
+    { id:"b82", scope:"hole", category:"wager", text:"Winner of the hole picks the tee box for the next hole." },
+    { id:"b83", scope:"hole", category:"wager", text:"Bogey-free hole earns double points; any bogey or worse costs a dollar." },
+    { id:"b84", scope:"hole", category:"wager", text:"Longest drive outside the fairway costs a dollar instead of winning." },
+    { id:"b85", scope:"hole", category:"wager", text:"Whoever three-jacks buys the next round from the beverage cart." },
+    { id:"b86", scope:"hole", category:"wager", text:"Highest score on the hole has to carry the flag to the next tee." },
+    { id:"b87", scope:"hole", category:"wager", text:"Group vote on ugliest swing this hole — loser owes a dollar." },
+    { id:"b88", scope:"hole", category:"wager", text:"Two-club wager — pick two clubs before the tee shot, use only those two the whole hole." },
+    { id:"b89", scope:"hole", category:"wager", text:"Call a tree before you tee off — closest to it off the tee wins a point." },
+    { id:"b90", scope:"hole", category:"wager", text:"Reverse skins — worst score on the hole wins the point." },
+    { id:"b91", scope:"hole", category:"wager", text:"Anyone who hits a provisional owes the group a dollar." },
+    { id:"b92", scope:"hole", category:"wager", text:"Loser of the hole has to read everyone else's putt for them on the next green." },
+    { id:"b93", scope:"hole", category:"wager", text:"Whoever wins the hole gets to rename it for the rest of the round." },
+    { id:"b94", scope:"hole", category:"wager", text:"First to lip out owes the table a dollar." },
+    { id:"b95", scope:"hole", category:"wager", text:"Whoever's tee shot finishes shortest buys the next round of waters." },
+
+    // ===== WAGER — round (10) =====
+    { id:"b96", scope:"round", category:"wager", text:"Lowest total score wins the round pot." },
+    { id:"b97", scope:"round", category:"wager", text:"Best back 9 wins bragging rights." },
+    { id:"b98", scope:"round", category:"wager", text:"Most birdies wins a side pot." },
+    { id:"b99", scope:"round", category:"wager", text:"Worst nine holes of the round buys dinner." },
+    { id:"b100", scope:"round", category:"wager", text:"Fewest total putts for the round wins a side pot." },
+    { id:"b101", scope:"round", category:"wager", text:"Front 9 vs back 9 — whoever improves the most wins a point." },
+    { id:"b102", scope:"round", category:"wager", text:"Most greens in regulation wins a side pot." },
+    { id:"b103", scope:"round", category:"wager", text:"Biggest single-hole blowup (strokes over par) buys the first round after." },
+    { id:"b104", scope:"round", category:"wager", text:"Closest to your own pre-round score prediction wins a point." },
+    { id:"b105", scope:"round", category:"wager", text:"Fewest penalty strokes for the round wins a side pot." },
+
+    // ===== FUN — hole (35) =====
+    { id:"b106", scope:"hole", category:"fun", text:"Free mulligan — use it now on this hole or lose it." },
+    { id:"b107", scope:"hole", category:"fun", text:"Improve your lie one club-length after your first shot, no penalty." },
+    { id:"b108", scope:"hole", category:"fun", text:"Two putter-lengths counts as a gimme on this green." },
+    { id:"b109", scope:"hole", category:"fun", text:"Pick a competitor's shot and make them rehit it." },
+    { id:"b110", scope:"hole", category:"fun", text:"Play your next shot with your opposite-handed grip." },
+    { id:"b111", scope:"hole", category:"fun", text:"Trade clubs with a playing partner for one shot." },
+    { id:"b112", scope:"hole", category:"fun", text:"Everyone gets an extra mulligan on the tee shot." },
+    { id:"b113", scope:"hole", category:"fun", text:"Loser of the last hole has to tee off first — no exceptions." },
+    { id:"b114", scope:"hole", category:"fun", text:"Play this hole without saying a word until everyone's ball is in the hole." },
+    { id:"b115", scope:"hole", category:"fun", text:"Whoever's turn it is must announce their shot like a TV commentator." },
+    { id:"b116", scope:"hole", category:"fun", text:"Give one opponent a mulligan of your choosing — they can't refuse it." },
+    { id:"b117", scope:"hole", category:"fun", text:"Play this hole wearing a hat backward, if you've got one." },
+    { id:"b118", scope:"hole", category:"fun", text:"Anyone who tops a shot has to do a golf-themed victory dance to make up for it." },
+    { id:"b119", scope:"hole", category:"fun", text:"Everyone hits their first putt with their eyes closed on this green." },
+    { id:"b120", scope:"hole", category:"fun", text:"Loser of the hole buys a round of tees for the group next time out." },
+    { id:"b121", scope:"hole", category:"fun", text:"Pick a club at random without looking and hit your tee shot with it." },
+    { id:"b122", scope:"hole", category:"fun", text:"Reverse honors — whoever's away tees off last instead of first." },
+    { id:"b123", scope:"hole", category:"fun", text:"Free do-over on any shot that hits a tree." },
+    { id:"b124", scope:"hole", category:"fun", text:"Whoever's closest to the pin has to give a mini golf lesson to the group." },
+    { id:"b125", scope:"hole", category:"fun", text:"One free club-length relief from any bad lie on this hole." },
+    { id:"b126", scope:"hole", category:"fun", text:"Give yourself a gimme from anywhere inside 10 feet — but announce it loudly." },
+    { id:"b127", scope:"hole", category:"fun", text:"Play this hole with a club you rarely use." },
+    { id:"b128", scope:"hole", category:"fun", text:"Everyone guesses their score before holing out — closest guess wins a point." },
+    { id:"b129", scope:"hole", category:"fun", text:"Loser of the hole has to carry the rangefinder for the next hole." },
+    { id:"b130", scope:"hole", category:"fun", text:"Play this hole after swapping bags with a partner." },
+    { id:"b131", scope:"hole", category:"fun", text:"Anyone who three-putts has to hum a tune walking to the next tee." },
+    { id:"b132", scope:"hole", category:"fun", text:"Free relief from any divot in the fairway." },
+    { id:"b133", scope:"hole", category:"fun", text:"Whoever hits the shortest drive picks the next hole's walk-up song." },
+    { id:"b134", scope:"hole", category:"fun", text:"Narrate one shot this hole like a sports commentator as you hit it." },
+    { id:"b135", scope:"hole", category:"fun", text:"Trade putters with a partner for this green only." },
+    { id:"b136", scope:"hole", category:"fun", text:"Anyone who three-putts owes the group a joke." },
+    { id:"b137", scope:"hole", category:"fun", text:"Free mulligan for the first player to lose a ball this hole." },
+    { id:"b138", scope:"hole", category:"fun", text:"Whoever's up first has to call \"fore\" before they hit, whether they need to or not." },
+    { id:"b139", scope:"hole", category:"fun", text:"Loser of the hole has to tee off using their putter." },
+    { id:"b140", scope:"hole", category:"fun", text:"Give a random opponent your read on their putt — they have to use it." },
+
+    // ===== FUN — round (10) =====
+    { id:"b141", scope:"round", category:"fun", text:"Everyone gets one free mulligan to use anytime this round." },
+    { id:"b142", scope:"round", category:"fun", text:"Pick one hole to replay in full if you're not happy with your score." },
+    { id:"b143", scope:"round", category:"fun", text:"Winner picks the next course you all play." },
+    { id:"b144", scope:"round", category:"fun", text:"Loser of the round carries the yardage book or rangefinder next time out." },
+    { id:"b145", scope:"round", category:"fun", text:"Everyone picks a \"nemesis hole\" before the round — extra bragging rights for beating it." },
+    { id:"b146", scope:"round", category:"fun", text:"Group picks a nickname for whoever posts the best round." },
+    { id:"b147", scope:"round", category:"fun", text:"Loser buys the first round at the 19th hole." },
+    { id:"b148", scope:"round", category:"fun", text:"Everyone gets to steal one mulligan from an opponent, once, during the round." },
+    { id:"b149", scope:"round", category:"fun", text:"Winner gets to plan the next tee time and course." },
+    { id:"b150", scope:"round", category:"fun", text:"Whoever has the most three-putts wears the \"three-putt title\" until the next round." }
+  ];
+
+  var CATS = ["skill", "improvement", "wager", "fun"];
+  var CAT_LABEL = { skill: "⛳ Skill", improvement: "📈 Improvement", wager: "💰 Wager", fun: "🎉 Fun" };
+  var STORAGE_KEY = "fairwayFlipCustomChallenges";
+
+  // ---------- State ----------
+  var state = {
+    activeTab: "hole",
+    selectedHole: 1,
+    filters: new Set(CATS),
+    customChallenges: [],
+    usedHoleIds: new Set(),
+    usedRoundIds: new Set(),
+    currentHoleChallenge: null,
+    currentRoundChallenge: null
+  };
+
+  function allChallenges() {
+    return BUILT_IN.concat(state.customChallenges);
+  }
+
+  function filteredPool(scope) {
+    return allChallenges().filter(function (c) {
+      return c.scope === scope && state.filters.has(c.category);
+    });
+  }
+
+  // ---------- Local storage (per-device custom challenges) ----------
+  function loadCustomChallenges() {
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      state.customChallenges = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      state.customChallenges = [];
+    }
+  }
+  function saveCustomChallenges() {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.customChallenges));
+    } catch (e) {
+      // storage unavailable (private browsing etc.) — additions just won't persist across reloads
+    }
+  }
+
+  // ---------- Toast ----------
+  var toastEl = document.getElementById("toast");
+  var toastTimer;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+  }
+
+  // ---------- Filters UI ----------
+  var filtersEl = document.getElementById("filters");
+  function renderFilters() {
+    filtersEl.innerHTML = "";
+    CATS.forEach(function (cat) {
+      var chip = document.createElement("button");
+      chip.className = "filter-chip" + (state.filters.has(cat) ? " active" : "");
+      chip.dataset.cat = cat;
+      chip.textContent = CAT_LABEL[cat];
+      chip.addEventListener("click", function () {
+        if (state.filters.has(cat)) {
+          if (state.filters.size === 1) { showToast("Keep at least one category on."); return; }
+          state.filters.delete(cat);
+        } else {
+          state.filters.add(cat);
+        }
+        renderFilters();
+        updatePoolCount();
+      });
+      filtersEl.appendChild(chip);
+    });
+  }
+
+  function updatePoolCount() {
+    var scope = state.activeTab;
+    var n = filteredPool(scope).length;
+    document.getElementById("poolCount").textContent =
+      n + (n === 1 ? " challenge matches your filters" : " challenges match your filters");
+    var note = scope === "hole" ? document.getElementById("holeEmptyNote") : document.getElementById("roundEmptyNote");
+    note.textContent = n === 0 ? "No challenges match your filters — turn one back on or add your own." : "";
+    var revealBtn = scope === "hole" ? document.getElementById("revealHoleBtn") : document.getElementById("revealRoundBtn");
+    revealBtn.disabled = n === 0;
+  }
+
+  // ---------- Hole strip UI ----------
+  var holeStripEl = document.getElementById("holeStrip");
+  function renderHoleStrip() {
+    holeStripEl.innerHTML = "";
+    for (var i = 1; i <= 18; i++) {
+      (function (num) {
+        var pill = document.createElement("button");
+        pill.className = "hole-pill" + (num === state.selectedHole ? " active" : "");
+        pill.textContent = num;
+        pill.addEventListener("click", function () {
+          state.selectedHole = num;
+          resetHoleCardToFront();
+          renderHoleStrip();
+        });
+        holeStripEl.appendChild(pill);
+      })(i);
+    }
+    document.getElementById("revealHoleNum").textContent = state.selectedHole;
+  }
+
+  // ---------- Tabs ----------
+  document.querySelectorAll(".tab-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      state.activeTab = btn.dataset.tab;
+      document.getElementById("panel-hole").classList.toggle("active", state.activeTab === "hole");
+      document.getElementById("panel-round").classList.toggle("active", state.activeTab === "round");
+      updatePoolCount();
+    });
+  });
+
+  // ---------- Card flip / draw logic ----------
+  function pickRandom(pool) {
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function drawChallenge(scope) {
+    var pool = filteredPool(scope);
+    if (pool.length === 0) return null;
+    var usedSet = scope === "hole" ? state.usedHoleIds : state.usedRoundIds;
+    var available = pool.filter(function (c) { return !usedSet.has(c.id); });
+    var reshuffled = false;
+    if (available.length === 0) {
+      usedSet.clear();
+      available = pool;
+      reshuffled = true;
+    }
+    var choice = pickRandom(available);
+    usedSet.add(choice.id);
+    return { challenge: choice, reshuffled: reshuffled };
+  }
+
+  function fillCardBack(prefix, challenge) {
+    var badge = document.getElementById(prefix + "CatBadge");
+    badge.className = "cat-badge " + challenge.category;
+    badge.textContent = CAT_LABEL[challenge.category];
+    document.getElementById(prefix + "ChallengeText").textContent = challenge.text;
+  }
+
+  function resetHoleCardToFront() {
+    var card = document.getElementById("holeCard");
+    card.classList.remove("flipped");
+    document.getElementById("redrawHoleBtn").disabled = true;
+    document.getElementById("holeFrontHint").textContent = 'Hit "Reveal" for Hole ' + state.selectedHole;
+    document.getElementById("revealHoleNum").textContent = state.selectedHole;
+    state.currentHoleChallenge = null;
+  }
+
+  function resetRoundCardToFront() {
+    var card = document.getElementById("roundCard");
+    card.classList.remove("flipped");
+    document.getElementById("redrawRoundBtn").disabled = true;
+    state.currentRoundChallenge = null;
+  }
+
+  function revealCard(scope) {
+    var pool = filteredPool(scope);
+    if (pool.length === 0) { showToast("No challenges match your filters."); return; }
+    var cardId = scope === "hole" ? "holeCard" : "roundCard";
+    var card = document.getElementById(cardId);
+    var result = drawChallenge(scope);
+    card.classList.add("scratching");
+    setTimeout(function () {
+      card.classList.remove("scratching");
+      fillCardBack(scope === "hole" ? "hole" : "round", result.challenge);
+      card.classList.add("flipped");
+      if (scope === "hole") {
+        state.currentHoleChallenge = result.challenge;
+        document.getElementById("redrawHoleBtn").disabled = false;
+      } else {
+        state.currentRoundChallenge = result.challenge;
+        document.getElementById("redrawRoundBtn").disabled = false;
+      }
+      if (result.reshuffled) showToast("Deck reshuffled — back through the pile!");
+    }, 480);
+  }
+
+  document.getElementById("revealHoleBtn").addEventListener("click", function () { revealCard("hole"); });
+  document.getElementById("revealRoundBtn").addEventListener("click", function () { revealCard("round"); });
+
+  document.getElementById("redrawHoleBtn").addEventListener("click", function () {
+    document.getElementById("holeCard").classList.remove("flipped");
+    setTimeout(function () { revealCard("hole"); }, 350);
+  });
+  document.getElementById("redrawRoundBtn").addEventListener("click", function () {
+    document.getElementById("roundCard").classList.remove("flipped");
+    setTimeout(function () { revealCard("round"); }, 350);
+  });
+
+  document.getElementById("newRoundBtn").addEventListener("click", function () {
+    state.usedHoleIds.clear();
+    state.usedRoundIds.clear();
+    state.selectedHole = 1;
+    resetHoleCardToFront();
+    resetRoundCardToFront();
+    renderHoleStrip();
+    showToast("New round — decks reset.");
+  });
+
+  // ---------- Share ----------
+  document.getElementById("shareBtn").addEventListener("click", function () {
+    var url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: "Fairway Flip", text: "Scratch-off golf challenges for our round — add your own too.", url: url }).catch(function () {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function () { showToast("Link copied — send it to your group!"); })
+        .catch(function () { showToast(url); });
+    } else {
+      showToast(url);
+    }
+  });
+
+  // ---------- Add challenge modal ----------
+  var overlay = document.getElementById("modalOverlay");
+  var newCat = null;
+  var newScope = null;
+
+  function openModal() {
+    document.getElementById("newChallengeText").value = "";
+    newCat = null;
+    newScope = null;
+    document.querySelectorAll("#newCatRow .pick-btn").forEach(function (b) { b.classList.remove("selected"); });
+    document.querySelectorAll("#newScopeRow .pick-btn").forEach(function (b) { b.classList.remove("selected"); });
+    overlay.classList.add("open");
+  }
+  function closeModal() { overlay.classList.remove("open"); }
+
+  document.getElementById("addChallengeBtn").addEventListener("click", openModal);
+  document.getElementById("cancelAddBtn").addEventListener("click", closeModal);
+  overlay.addEventListener("click", function (e) { if (e.target === overlay) closeModal(); });
+
+  document.querySelectorAll("#newCatRow .pick-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll("#newCatRow .pick-btn").forEach(function (b) { b.classList.remove("selected"); });
+      btn.classList.add("selected");
+      newCat = btn.dataset.cat;
+    });
+  });
+  document.querySelectorAll("#newScopeRow .pick-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll("#newScopeRow .pick-btn").forEach(function (b) { b.classList.remove("selected"); });
+      btn.classList.add("selected");
+      newScope = btn.dataset.scope;
+    });
+  });
+
+  document.getElementById("saveAddBtn").addEventListener("click", function () {
+    var text = document.getElementById("newChallengeText").value.trim();
+    if (!text) { showToast("Write the challenge first."); return; }
+    if (!newCat) { showToast("Pick a category."); return; }
+    if (!newScope) { showToast("Pick hole or round."); return; }
+    var item = { id: "local-" + Date.now(), scope: newScope, category: newCat, text: text };
+    state.customChallenges.push(item);
+    saveCustomChallenges();
+    updatePoolCount();
+    showToast("Added to your deck!");
+    closeModal();
+  });
+
+  // ---------- Init ----------
+  loadCustomChallenges();
+  renderFilters();
+  renderHoleStrip();
+  updatePoolCount();
+})();
+</script>
+</body>
+</html>
